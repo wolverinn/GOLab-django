@@ -1,0 +1,41 @@
+<html>
+    {% if msg != "ok" %}
+    <head>
+        <title>golab|change password</title>
+    </head>
+    <body>
+        <h1>change password</h1>
+        <p>{{msg}}</p>
+        <form action="/gogate/password/" method="POST">
+            <table>
+                {% csrf_token %}
+                <tr>
+                    <td>old password:</td>
+                    <td><input type="password" name="old_pass"></td>
+                </tr>
+                <tr>
+                    <td>new password:</td>
+                    <td><input type="password" name="new_pass"></td>
+                </tr>
+                <tr>
+                    <td><input type="submit" value="confirm"></td>
+                </tr>
+            </table>
+        </form>
+    </body>
+    {% else %}
+    <head>
+        <title>Golab|user</title>
+    </head>
+    <body>
+        <h1>Golab|user</h1>
+        <a href="/gogate/password/">change password</a>
+        <br/>
+        <p>monitering:</p>
+        <p>设置套餐</p>
+        <p>change email</p>
+        <p>change phone</p>
+        <a href="/gogate/sign-out/">sign out</a>
+    </body>
+    {% endif %}
+</html>

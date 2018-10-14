@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>golab|设置套餐</title>
+    </head>
+    <body>
+        <h1>设置套餐</h1>
+        <h3>current:</h3>
+        {% if number_of_items == 0 %}
+        <p>你还没有套餐</p>
+        {% else %}
+        <table>
+            <tr>
+                <td>notification method</td>
+                <td>maximum number of items</td>
+                <td>check frequency</td>
+                <td>start date</td>
+                <td>lasting for</td>
+            </tr>
+            <tr>
+                <td>{% if send_to_email is True %}email{% else %}text message{% endif %}</td>
+                <td>{{ number_of_items }}</td>
+                <td>{{ check_freq }}</td>
+                <td>{{ start_day }}</td>
+                <td>{{ time_span }} days</td>
+            </tr>
+        </table>
+        {% endif %}
+        <form action="/gogate/payment/" method="POST">
+            {% csrf_token %}
+            <input type="radio" name="send_to_email" value="email">
+            <span>email</span>
+            <br/>
+            <input type="radio" name="send_to_email" value="phone">
+            <span>phone</span>
+            <br/>
+            <span>number of items:</span>
+            <input type="number" name="number_of_items">
+            <br/>
+            <span>check frequency: <br/>every</span>
+            <br/>
+            <input type="radio" name="freq" value="day">
+            <span>day</span>
+            <br/>
+            <input type="radio" name="freq" value="hours">
+            <span>hour</span>
+            <br/>
+            <input type="radio" name="freq" value="minutes">
+            <span>minute</span>
+            <br/>
+            <input type="radio" name="freq" value="seconds">
+            <span>20 seconds</span>
+            <br/>
+            <input type="number" name="time_span">
+            <span>lasting for(days):</span>
+            <br/>
+            <input type="submit" value="proceed to payment page">
+        </form>
+    </body>
+</html>

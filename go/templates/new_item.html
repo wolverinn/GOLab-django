@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>golab|set a new item</title>
+    </head>
+    <body>
+        <h1>setting</h1>
+        <form action="/gogate/user/" method="GET">
+            {% csrf_token %}
+            <input type="hidden" name="item_name" value={{item_name}}>
+            <tr>
+                <td>maximum price:</td>
+                <td><input type="text" name="max_price"></td>
+            </tr>
+            <tr>
+                <td>maximum wear:</td>
+                <td><input type="text" name="max_wear"></td>
+            </tr>
+            <tr>
+                <input type="submit" value="confirm">
+            </tr>
+        </form>
+    </body>
+</html>

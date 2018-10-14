@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <title>golab</title>
+    </head>
+    <body>
+        <h1>Welcome to Golab</h1>
+        <h2>一键查询igxe/buff的csgo皮肤信息，获取玄学信息，以及获得最新提醒(目前只支持武器和音乐盒)</h2>
+        <br/>
+        {% if auth == False %}
+        <a href="/gogate/sign-in/">sign in</a>
+        <br/>
+        <a href="/gogate/sign-up/">sign up</a>
+        {% else %}
+        <a href="/gogate/sign-in/">user center</a>
+        <br/>
+        <a href="/gogate/sign-out/">sign out</a>
+        {% endif %}
+        <br/>
+        <p>输入皮肤名称进行查询</p>
+        <form action = "/gogate/" method="post">
+            {% csrf_token %}
+            <input type = "text" name = "keywords">
+            <input type="submit" value="GO">
+        </form>
+        <h2>{{index}}</h2>
+        {% if search_result != None %}
+            {% for item in search_result %}
+                <div>
+                    <span><a href={{ item.href }}>{{ item.name }}</a></span>
+                    <ul>
+                        <li>buff最低价：{{ item.buff_min_price }}</li>
+                        <li>igxe最低价：{{ item.ig_min_price }}</li>
+                        <li>buff在售：{{ item.buff_sell_num }}</li>
+                        <li>igxe在售：{{ item.ig_sell_num }}</li>
+                    </ul>
+                </div>
+            {% endfor %}
+        {% else %}
+            <h3>no search result</h3>
+        {% endif %}
+        <a href="/gogate/faq/">常见问题</a>|<a href="/gogate/contact-us/">联系我们</a>
+    </body>
+</html>

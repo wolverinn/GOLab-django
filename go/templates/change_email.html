@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>golab|change email</title>
+    </head>
+    <body>
+        {% if msg == "mail" %}
+        <h1>change email</h1>
+        <form action="/gogate/email/" method="POST">
+            {% csrf_token %}
+            <input type="email" name="newmail">
+            <input type="submit" value="next">
+        </form>
+        {% elif msg == "vercode" %}
+        <h1>input verification code</h1>
+        <h3>email containing verification code has been sent to: {{ newmail }}</h3>
+        <form action="/gogate/email/" method="POST">
+            {% csrf_token %}
+            <p>input verification code</p>
+            <input type="text" name="vercode">
+            <input type="hidden" name="newmail" value={{newmail}}>
+            <input type="submit" value="confirm">
+        </form>
+        {% elif msg == "complete" %}
+        <h1>success</h1>
+        <h3><a href="/gogate/user/">return</a></h3>
+        {% endif %}
+    </body>
+</html>

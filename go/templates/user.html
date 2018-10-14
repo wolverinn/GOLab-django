@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>Golab|user</title>
+    </head>
+    <body>
+        <h1>Golab|user</h1>
+        <a href="/gogate/password/">change password</a>
+        <br/>
+        <div>
+            <h3>monitering:</h3>
+            <table>
+                <tr>
+                    <td>item name</td>
+                    <td>maximum price</td>
+                    <td>maximum wear</td>
+                    <td>玄学要求</td>
+                </tr>
+                {% if isvip is True %}
+                {% for i in len_item_list %}
+                <tr>
+                    <td>{{ monitored_items.i }}</td>
+                    <td>{{ price.i }}</td>
+                    <td>{{ wear.i }}</td>
+                    <td>{{ rare.i }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <span>you are currently not a vip member,you need to become a vip to start monitoring items</span>
+                {% endif %}
+            </table>
+        </div>
+        <a href="/gogate/choose-level/">设置套餐</a>
+        <br/>
+        {% if isvip is True %}
+        <a href="/gogate/email/">change email</a>
+        <br/>
+        <p>change phone</p>
+        {% endif %}
+        <a href="/gogate/sign-out/">sign out</a>
+    </body>
+</html>

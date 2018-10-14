@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>search results|golab</title>
+    </head>
+    <body>
+        <h1>golab| showing items:{{ name }}</h1>
+        <p>go to: <a href={{igxe_link}} target="_blank">igxe</a> | <a href={{buff_link}} target="_blank">buff</a></p>
+        <form action="/gogate/new-items/" method="GET">
+            {% csrf_token %}
+            <input type="hidden" name="name" value={{name}}>
+            <input type="submit" value="monitor this item">
+        </form>
+        {% for item in items %}
+            <div>￥{{ item.price }} ({{ item.site }})</div>
+            <ul>
+                <li>磨损：{{ item.wear }}</li>
+                <li><a href="{{ item.steam_link }}" target="_blank">检视链接</a></li>
+            </ul>
+        {% endfor %}
+    </body>
+</html>
