@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from django.http import HttpResponseRedirect
 from go.models import User
 from django.core.mail import send_mail
@@ -11,18 +11,27 @@ import os
 
 # html-base-head&foot(log-state)
 # js funcs:login-before-monitor
-# 玄学，Ajax加载搜索结果，igxe-api
+# 玄学，Ajax加载搜索结果
+# https://www.cnblogs.com/seven-007/p/8034043.html
+# https://blog.csdn.net/tigaoban/article/details/78237244?foxhandler=RssReadRenderProcessHandler
 
 
 # Create your views here.
 
 
 def jsapi(request):
-    return render
+    username = "default"
+    if request.is_ajax():
+        username = request.POST.get('username')
+    #     password = request.GET.get('password')
+    return JsonResponse({'res':username})
 
 def user(request):
     context = {}
-    user = User.objects.get(username=request.session['username'])
+    try:
+        user = User.objects.get(username=request.session['username'])
+    except:
+        return HttpResponseRedirect('/gogate/sign-in/')
     if request.session.get('authenticated',False):
         if user.is_vip == True:
             if request.GET.get('item_name',None) != None:
@@ -82,6 +91,7 @@ def sign_in(request):
             if password == user.password and vercode == request.session['photo_vercode']:
                 request.session['authenticated'] = True
                 request.session['username'] = username
+                request.session['isvip'] = False
             else:
                 correct_vercode = gen_vercode.gene_code(4)
                 request.session['photo_vercode'] = correct_vercode
@@ -112,6 +122,7 @@ def sign_up(request):
                 user.save()
                 request.session['authenticated'] = True
                 request.session['username'] = username
+                request.session['isvip'] = False
             else:
                 correct_vercode = gen_vercode.gene_code(4)
                 request.session['photo_vercode'] = correct_vercode
@@ -130,7 +141,7 @@ def sign_up(request):
     return render(request,'sign_up.html',{'auth':authentication,'img':img_src})
 def sign_out(request):
     request.session['authenticated'] = False
-    return render(request,'base.html',{'index':'','search_result':None,'auth':False})
+    return HttpResponseRedirect('/gogate/')
 def change_password(request):
     msg = ""
     old_pass = request.POST.get("old_pass")
@@ -193,8 +204,5 @@ def change_email(request):
 
 def payment(request):
     return render(request,'payment.html')
-def new_item(request):
-    item_name = request.GET.get('name')
-    return render(request,'new_item.html',{'item_name':item_name})
 def forget_pass(request):
     return render(request,'forget_pass.html')

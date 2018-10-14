@@ -5,8 +5,9 @@ import random
 
 from go.models import CsgoApi
 
-def search_item(keyword):
+def search_item(keyword,page):
     item = []
+    total = 1
     def check_igxe(name):
         check_url = "https://www.igxe.cn/csgo/730?keyword={}".format(name)
         check_page = requests.get(check_url)
@@ -19,14 +20,15 @@ def search_item(keyword):
             return check_api,check_num,check_price
         else:
             return '','',''
-    def buff_search(keyword,page_num="1"):
+    def buff_search(keyword,page_num):
         search_api = "https://buff.163.com/api/market/goods?game=csgo&page_num={}&search={}".format(page_num,keyword)
         search_action = requests.get(search_api)
         if search_action.status_code is 200:
             search_result = search_action.json()
             total_page = search_result["data"]["total_page"]
             if total_page == 0:
-                return item
+                # return item
+                return total_page
             all_item = search_result["data"]["items"]
             for single_item in all_item:
                 if single_item["goods_info"]["info"]["tags"].get("exterior") is None:
@@ -68,11 +70,12 @@ def search_item(keyword):
                     "href":href
                 }
                 item.append(temp_info)
-            if total_page > int(page_num):
-                page_num = str(int(page_num) + 1)
-                buff_search(keyword,page_num)
-    buff_search(keyword)
-    return item
+            return total_page
+            # if total_page > int(page_num):
+            #     page_num = str(int(page_num) + 1)
+            #     buff_search(keyword,page_num)
+    total = buff_search(keyword,page)
+    return item,total
 def get_igxe_detail(igxe_api,page_num="1"):
     igxe_item = []
     api_url = "https://www.igxe.cn/product/trade/" + igxe_api + "?page_no={}".format(page_num)
@@ -126,7 +129,7 @@ def get_buff_detail(buff_api,page_num="1"):
     return buff_item
 
 def rank_items(all_items): 
-    ranked_list = sorted(all_items, key=lambda item: item["price"])
+    ranked_list = sorted(all_items, key=lambda item: float(item["price"]))
     return ranked_list
 def gen_vercode(num):
     vercode = ""

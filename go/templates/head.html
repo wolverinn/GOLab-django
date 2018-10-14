@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $.ajax({
+                    url:'/gogate/user-state/',
+                    type:'GET'
+                }).done(function(data){
+                    if(data['state'] == 0){
+                        $("#in").hide()
+                    }
+                    else{
+                        $("#out").hide()
+                    }
+                })
+                $("#mainlink").click(function(){
+                    window.location.href = "/gogate/"
+                })
+                $("#signout").click(function(){
+                    $.ajax({
+                        url:'/gogate/sign-out/',
+                        type:"GET",
+                    }).done(function(data){
+                        parent.location.reload()
+                        // window.location.reload()
+                    })
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <div id="mainlink" style="cursor: hand;">
+            <h1>Golab</h1>
+            <h2>一键查询igxe/buff的csgo皮肤信息，获取玄学信息，以及获得最新提醒(目前只支持武器和音乐盒)</h2>
+            <br/>
+        </div>
+        <div id="out">
+            <a href="/gogate/sign-in/">sign in</a>
+            <br/>
+            <a href="/gogate/sign-up/">sign up</a>
+        </div>
+        <div id="in">
+            <a href="/gogate/user/">user center</a>
+            <br/>
+            <a href id="signout">sign out</a>
+        </div>
+        <br/>
+    </body>
+</html>

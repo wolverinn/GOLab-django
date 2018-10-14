@@ -1,9 +1,20 @@
 <html>
     <head>
         <title>Golab|user</title>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $("#mainlink").click(function(){
+                    window.location.href = "/gogate"
+                })
+            })
+        </script>
     </head>
     <body>
-        <h1>Golab|user</h1>
+        <div id="mainlink" style="cursor: hand;">
+            <h1>Golab|user</h1>
+            <br/>
+        </div>
         <a href="/gogate/password/">change password</a>
         <br/>
         <div>

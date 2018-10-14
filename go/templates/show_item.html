@@ -1,16 +1,54 @@
 <html>
     <head>
         <title>search results|golab</title>
-        <script src="jquery-3.3.1.min.js"></script>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $("#head").load('/gogate/head/')
+                $("#foot").load('/gogate/foot/')
+                $("#show_rules").hide()
+                $("button#monitor").click(function(){
+                    name = $("span#item_name").text()
+                    $.ajax({
+                        url:"/gogate/user-state/",
+                        data:{'name':name},
+                        type:"GET",
+                    }).done(function(data){
+                        if(data['state'] == 0){
+                            alert("you need to log in first")
+                        }
+                        else if(data['state'] == 1){
+                            alert(" 你需要先设置套餐才能开启皮肤通知")
+                        }
+                        else{
+                            $('#show_rules').show()
+                        }
+                    })
+                })
+            })
+        </script>
     </head>
     <body>
-        <h1>golab| showing items:{{ name }}</h1>
+        <div id="head"></div>
+        <h3>showing items:<span id="item_name">{{ name }}</span></h3>
         <p>go to: <a href={{igxe_link}} target="_blank">igxe</a> | <a href={{buff_link}} target="_blank">buff</a></p>
-        <form action="/gogate/new-items/" method="GET">
-            {% csrf_token %}
-            <input type="hidden" name="name" value={{name}}>
-            <input type="submit" value="monitor this item">
-        </form>
+        <button id="monitor">monitor this item</button>
+        <div id="show_rules">
+            <form action="/gogate/user/" method="GET">
+                <input type="hidden" name="item_name" value={{item_name}}>
+                <tr>
+                    <td>maximum price:</td>
+                    <td><input type="text" name="max_price"></td>
+                </tr>
+                <tr>
+                    <td>maximum wear:</td>
+                    <td><input type="text" name="max_wear"></td>
+                </tr>
+                <tr>
+                    <input type="submit" value="confirm">
+                </tr>
+            </form>
+        </div>
         {% for item in items %}
             <div>￥{{ item.price }} ({{ item.site }})</div>
             <ul>
@@ -18,5 +56,6 @@
                 <li><a href="{{ item.steam_link }}" target="_blank">检视链接</a></li>
             </ul>
         {% endfor %}
+        <div id="foot"></div>
     </body>
 </html>

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from django.http import HttpResponseRedirect
 # from go.models import User
 # from django.core.mail import send_mail
@@ -12,17 +12,46 @@ def home(request):
     response = HttpResponse()
     response.write("<h1>welcome,begin <a href = './gogate'>searching</a></h1>")
     return response
+def head(request):
+    return render(request,'head.html')
+def foot(request):
+    return render(request,'foot.html')
+def user_state(request):
+    auth = request.session.get('authenticated',False)
+    isvip = request.session.get('isvip',False)
+    if auth == False:
+        return JsonResponse({'state':0})
+    elif isvip == False:
+        return JsonResponse({'state':1})
+    else:
+        return JsonResponse({'state':2})
 
 def search(request):
+    if request.is_ajax():
+        keyword = request.GET.get('keywords',None)
+        page = request.GET.get('page_num',"1")
+        search_result,total_page = golablib.search_item(keyword,page)
+        index = "search result"
+        return JsonResponse({'search_result':search_result})
     authentication = request.session.get('authenticated',False)
-    keyword = request.POST.get('keywords',None)
+    keyword = request.GET.get('keywords',None)
+    page = request.GET.get('page_num',"1")
     if keyword != None:
-        search_result = golablib.search_item(keyword)
+        search_result,total_page = golablib.search_item(keyword,page)
         index = "search result"
     else:
         search_result = None
+        total_page = 0
         index = ""
-    return render(request,'base.html',{'search_result':search_result,"index":index,'auth':authentication})
+    context = {
+        'search_result':search_result,
+        'search_item':keyword,
+        "index":index,
+        'auth':authentication,
+        'total':total_page,
+        "current":page
+        }
+    return render(request,'base.html',context)
 def show_item(request,api):
     igxe_api = api.split('--')[1]
     buff_api = api.split('--')[0]
@@ -40,7 +69,7 @@ def show_item(request,api):
         }
     return render(request,'show_item.html',context)
 
-def faq(request):
-    return render(request,'faq.html')
-def contact_us(request):
-    return render(request,'contact_us.html')
+# def faq(request):
+#     return render(request,'faq.html')
+# def contact_us(request):
+#     return render(request,'contact_us.html')
