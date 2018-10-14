@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 from urllib import parse
 import random
 
+from go.models import CsgoApi
+
 def search_item(keyword):
     item = []
     def check_igxe(name):
@@ -16,8 +18,7 @@ def search_item(keyword):
             check_num = check_data.find('div',attrs={'class','sum fr'}).string
             return check_api,check_num,check_price
         else:
-            return "None",None,None
-
+            return '','',''
     def buff_search(keyword,page_num="1"):
         search_api = "https://buff.163.com/api/market/goods?game=csgo&page_num={}&search={}".format(page_num,keyword)
         search_action = requests.get(search_api)
@@ -28,35 +29,48 @@ def search_item(keyword):
                 return item
             all_item = search_result["data"]["items"]
             for single_item in all_item:
-                temp_ig1,temp_ig2,temp_ig3 = check_igxe(single_item["name"])
                 if single_item["goods_info"]["info"]["tags"].get("exterior") is None:
                     wear_catagory = None
                 else:
                     wear_catagory = single_item["goods_info"]["info"]["tags"]["exterior"]["localized_name"]
                 buff_api = single_item["id"]
                 name = single_item["name"]
-                href = "./"+"item/"+str(buff_api)+"--"+temp_ig1+ "--"+str(name) +"/"
+                ig_sell_num = ''
+                ig_min_price = ''
+                try:
+                    skin = CsgoApi.objects.get(buff_api=buff_api)
+                except CsgoApi.DoesNotExist:
+                    igxe_api = ''
+                else:
+                    igxe_api = skin.igxe_api
+                if igxe_api != '':
+                    igxe_url = "https://www.igxe.cn/product/trade/" + igxe_api
+                    igxe_request = requests.get(igxe_url)
+                    if igxe_request.status_code is 200:
+                        data = igxe_request.json()
+                        ig_sell_num = data["page"]["total"]
+                        ig_min_price = data["d_list"][0]["unit_price"]
+                else:
+                    igxe_api,ig_sell_num,ig_min_price = check_igxe(name)
+                href = "./"+"item/"+str(buff_api)+"--"+igxe_api+ "--"+str(name) +"/"
                 href = parse.quote(href)
                 temp_info = {
-                    "name": single_item["name"],
+                    "name": name,
                     "wear_catagory": wear_catagory,
                     "rarity": single_item["goods_info"]["info"]["tags"]["rarity"]["localized_name"],
                     "buff_api": buff_api,
                     "icon_url": single_item["goods_info"]["icon_url"],
                     "buff_sell_num": single_item["sell_num"],
                     "buff_min_price": single_item["sell_min_price"],
-                    "igxe_api": temp_ig1,
-                    "ig_sell_num": temp_ig2,
-                    "ig_min_price": temp_ig3,
+                    "igxe_api": igxe_api,
+                    "ig_sell_num": ig_sell_num,
+                    "ig_min_price": ig_min_price,
                     "href":href
                 }
                 item.append(temp_info)
             if total_page > int(page_num):
                 page_num = str(int(page_num) + 1)
                 buff_search(keyword,page_num)
-        else:
-            print("This search has returned 0 result")
-
     buff_search(keyword)
     return item
 def get_igxe_detail(igxe_api,page_num="1"):

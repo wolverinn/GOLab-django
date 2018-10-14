@@ -21,3 +21,7 @@ class User(models.Model):
     price_restrictions = models.CharField(max_length=200)
     wear_restrictions = models.CharField(max_length=200)
     rare_restrictions = models.CharField(max_length=200)
+
+class CsgoApi(models.Model):
+    buff_api = models.CharField(max_length=20,primary_key=True)
+    igxe_api = models.CharField(max_length=20)

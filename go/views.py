@@ -4,20 +4,21 @@ from django.http import HttpResponseRedirect
 from go.models import User
 from django.core.mail import send_mail
 
-# phone/verification code/payment
-# /javascript-middleman/html-base-head&foot(log-state)
+from go import gen_vercode
+import os
+
+# after online:phone-verification-code/payment
+
+# html-base-head&foot(log-state)
 # js funcs:login-before-monitor
 # 玄学，Ajax加载搜索结果，igxe-api
 
-def gen_vercode(num):
-    vercode = ""
-    number = list(range(10))
-    ver_list = random.sample(number,num)
-    for i in ver_list:
-        vercode = vercode + str(i)
-    return vercode
 
 # Create your views here.
+
+
+def jsapi(request):
+    return render
 
 def user(request):
     context = {}
@@ -63,42 +64,70 @@ def user(request):
     else:
         return HttpResponseRedirect('/gogate/sign-in/')
 def sign_in(request):
+    try:
+        os.remove('./static/img/{}.png'.format(request.session['photo_vercode']))
+    except:
+        pass
     username = request.POST.get('username',None)
     password = request.POST.get('password',None)
     vercode = request.POST.get('vercode',None)
-    if username != None and password != None:
+    if username != None and password != None and vercode != None:
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            pass
+            correct_vercode = gen_vercode.gene_code(4)
+            request.session['photo_vercode'] = correct_vercode
+            img_src = "./img/{}.png".format(correct_vercode)
         else:
-            if password == user.password:
+            if password == user.password and vercode == request.session['photo_vercode']:
                 request.session['authenticated'] = True
                 request.session['username'] = username
             else:
+                correct_vercode = gen_vercode.gene_code(4)
+                request.session['photo_vercode'] = correct_vercode
+                img_src = "./img/{}.png".format(correct_vercode)
                 request.session['authenticated'] = False
+    else:
+        correct_vercode = gen_vercode.gene_code(4)
+        request.session['photo_vercode'] = correct_vercode
+        img_src = "./img/{}.png".format(correct_vercode)
     authentication = request.session.get('authenticated',False)
     if authentication is True:
         return HttpResponseRedirect('/gogate/user/')
-    return render(request,'sign_in.html',{'auth':authentication})
+    return render(request,'sign_in.html',{'auth':authentication,'img':img_src})
 def sign_up(request):
+    try:
+        os.remove('./static/img/{}.png'.format(request.session['photo_vercode']))
+    except:
+        pass
     username = request.POST.get('username',None)
     password = request.POST.get('password',None)
     vercode = request.POST.get('vercode',None)
-    if username != None and password != None:
-        try:
-            User.objects.get(username=username)
-        except User.DoesNotExist:
-            user = User(username=username,password=password)
-            user.save()
-            request.session['authenticated'] = True
-            request.session['username'] = username
+    if username != None and password != None and vercode != None:
+        if vercode == request.session.get('photo_vercode',False):
+            try:
+                User.objects.get(username=username)
+            except User.DoesNotExist:
+                user = User(username=username,password=password)
+                user.save()
+                request.session['authenticated'] = True
+                request.session['username'] = username
+            else:
+                correct_vercode = gen_vercode.gene_code(4)
+                request.session['photo_vercode'] = correct_vercode
+                img_src = "./img/{}.png".format(correct_vercode)
         else:
-            pass
+            correct_vercode = gen_vercode.gene_code(4)
+            request.session['photo_vercode'] = correct_vercode
+            img_src = "./img/{}.png".format(correct_vercode)
+    else:
+        correct_vercode = gen_vercode.gene_code(4)
+        request.session['photo_vercode'] = correct_vercode
+        img_src = "./img/{}.png".format(correct_vercode)
     authentication = request.session.get('authenticated',False)
     if authentication is True:
         return HttpResponseRedirect('/gogate/user/')
-    return render(request,'sign_up.html',{'auth':authentication})
+    return render(request,'sign_up.html',{'auth':authentication,'img':img_src})
 def sign_out(request):
     request.session['authenticated'] = False
     return render(request,'base.html',{'index':'','search_result':None,'auth':False})
@@ -140,7 +169,7 @@ def change_email(request):
         vercode_get = request.POST.get('vercode',None)
         if newmail != None and vercode_get == None:
             msg = "vercode"
-            vercode = gen_vercode(6)
+            vercode = gen_vercode.gen_text(6)
             request.session['email_vercode'] = vercode
             content = "your verification code:"+vercode
             send_mail(

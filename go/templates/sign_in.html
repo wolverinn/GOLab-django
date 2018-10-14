@@ -12,6 +12,8 @@
             <input type="password" name = "password">
             <p>verification code:</p>
             <input type="text" name = "vercode">
+            {% load static %}
+            <img src="{% static img %}" alt="verification" height=30 width=100 />
             <input type="submit" value="sign in">
         </form>
         <a href="/gogate/sign-up/">sign up</a>

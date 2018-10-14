@@ -23,7 +23,7 @@ def search(request):
         search_result = None
         index = ""
     return render(request,'base.html',{'search_result':search_result,"index":index,'auth':authentication})
-def show_item(request,item,api):
+def show_item(request,api):
     igxe_api = api.split('--')[1]
     buff_api = api.split('--')[0]
     item_name = api.split('--')[2]

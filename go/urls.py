@@ -16,5 +16,5 @@ urlpatterns = [
     path('new-items/',views.new_item),
     path('forget-pass/',views.forget_pass),
     path('payment/',views.payment),
-    path('<str:item>/<path:api>/',simple_views.show_item)
+    path('item/<path:api>/',simple_views.show_item)
 ]
