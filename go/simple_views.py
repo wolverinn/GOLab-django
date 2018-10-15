@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse,JsonResponse
 from django.http import HttpResponseRedirect
-from go.models import CsgoApi
+from go.models import CsgoApi,Declare,User
 from django.db.models import Q
 # from django.core.mail import send_mail
 
@@ -10,8 +10,8 @@ from urllib import parse
 
 # Create your views here.
 
-# ajax:load exinfo
-# monitor using server/administration page:monitoring+declare-info+shringking-database
+# ajax:load exinfo/js滑块验证
+# monitor using server/administration page:monitoring
 # phone-verification-code/payment
 
 
@@ -21,6 +21,43 @@ def head(request):
     return render(request,'head.html')
 def foot(request):
     return render(request,'foot.html')
+def superadmin(request):
+    declare_list = []
+    if request.method == "POST":
+        secret_key = request.POST.get("secret_key")
+        if secret_key == "Wolverine":
+            request.session["adminauth"] = True
+    auth = request.session.get("adminauth",False)
+    if auth is True:
+        if request.method == "GET":
+            ig_link = request.GET.get("ig",None)
+            if ig_link != None:
+                action = request.GET.get('action')
+                declare_item = Declare.objects.get(igxe_link=ig_link)
+                if action == "check":
+                    declare_item.checked = True
+                    declare_item.save()
+                else:
+                    declare_item.delete()
+        try:
+            # all_declared = Declare.objects.filter(checked__contains=False)
+            all_declared = Declare.objects.all()
+            for single_declare in all_declared:
+                if single_declare.checked:
+                    continue
+                else:
+                    checked_href = "/superadmin?ig="+str(single_declare.igxe_link)+"&action=check"
+                    remove_href = "/superadmin?ig="+str(single_declare.igxe_link)+"&action=remove"
+                    temp_info = {
+                        "ig":single_declare.igxe_link,
+                        "buff":single_declare.buff_link,
+                        "check_href":checked_href,
+                        "remove_href":remove_href
+                    }
+                    declare_list.append(temp_info)
+        except Declare.DoesNotExist:
+            pass
+    return render(request,'superadmin.html',{"declare_list":declare_list,"auth":auth})
 def user_state(request):
     auth = request.session.get('authenticated',False)
     isvip = request.session.get('isvip',False)
@@ -73,6 +110,12 @@ def search(request):
         }
     return render(request,'search_result.html',context)
 def show_item(request,api):
+    if request.is_ajax():
+        igxe_link = request.POST.get("ig")
+        buff_link = request.POST.get("buff")
+        new_declare = Declare(igxe_link=igxe_link,buff_link=buff_link)
+        new_declare.save()
+        return JsonResponse({'msg':1})
     brief_sell_status = []
     igxe_api = api.split('--')[1]
     buff_api = api.split('--')[0]
@@ -87,10 +130,12 @@ def show_item(request,api):
     if igxe_api != '':
         ig_sell_num,ig_item = golablib.get_igxe_detail(igxe_api,page_num)
         ig_min_price = ig_item[0]["price"]
+        if_ig = 1
     else:
         ig_sell_num = "null"
         ig_min_price = "null"
         ig_item = []
+        if_ig = 0
     buff_min_price = buff_item[0]["price"]
     brief_sell_status = [ig_sell_num,buff_sell_num,ig_min_price,buff_min_price,page_num]
     ranked_item = golablib.rank_items(ig_item+buff_item)
@@ -102,10 +147,85 @@ def show_item(request,api):
         "igxe_link":igxe_link,
         "buff_link":buff_link,
         "sell_status":brief_sell_status,
-        "name":item_name
+        "buff_api":buff_api,
+        "ig_api":igxe_api,
+        "name":item_name,
+        "if_ig":if_ig
         }
     return render(request,'show_item.html',context)
 
+def remove_monitor_item(request):
+    if request.session.get('username',False):
+        current_user = User.objects.get(username=request.session['username'])
+        buff_api = "**"+request.GET.get('buff')
+        igxe_api = "**"+request.GET.get('igxe')
+        price = "**"+request.GET.get('price')
+        wear = "**"+request.GET.get('wear')
+        rare = "**"+request.GET.get('rare')
+        current_user.price_restrictions = current_user.price_restrictions.replace(price,'')
+        current_user.wear_restrictions = current_user.wear_restrictions.replace(wear,'')
+        current_user.rare_restrictions = current_user.wear_restrictions.replace(rare,'')
+        current_user.monitored_buff_apis = current_user.monitored_buff_apis.replace(buff_api,'')
+        current_user.monitored_igxe_apis = current_user.monitored_igxe_apis.replace(igxe_api,'')
+        current_user.save()
+        return HttpResponseRedirect('/gogate/user/')
+    else:
+        return HttpResponseRedirect('/gogate/sign-in/')
+
+def send_monitor_data(request):
+    usr_list = []
+    usr_data = {}
+    if request.GET.get("key") == 'Wolverine':
+        freq = request.GET.get("freq")
+        try:
+            freq_usr = User.objects.filter(check_frequency__contains=freq).filter(monitored_buff_apis__contains="**")
+        except User.DoesNotExist:
+            pass
+        else:
+            for usr in freq_usr:
+                temp_info = {
+                    "username":usr.username,
+                    "buff_apis":usr.monitored_buff_apis,
+                    "igxe_apis":usr.monitored_igxe_apis,
+                    "price_restrictions":usr.price_restrictions,
+                    "wear_restrictions":usr.wear_restrictions,
+                    "rare_restrictions":usr.rare_restrictions,
+                    "phone":usr.phone,
+                    "start_day":usr.start_day,
+                    "span":usr.time_span,
+                }
+                usr_list.append(temp_info)
+    usr_data["usr"] = usr_list
+    return JsonResponse(usr_data)
+def remove_user_item(request):
+    if request.GET.get("key") == "Wolverine":
+        current_user = User.objects.get(username=request.GET.get("username"))
+        buff_api = "**"+request.GET.get("buff_api")
+        igxe_api = "**"+request.GET.get("igxe_api")
+        price = "**"+request.GET.get("price")
+        wear = "**"+request.GET.get("wear")
+        rare = "**"+request.GET.get("rare")
+        current_user.price_restrictions = current_user.price_restrictions.replace(price,'')
+        current_user.wear_restrictions = current_user.wear_restrictions.replace(wear,'')
+        current_user.rare_restrictions = current_user.wear_restrictions.replace(rare,'')
+        current_user.monitored_buff_apis = current_user.monitored_buff_apis.replace(buff_api,'')
+        current_user.monitored_igxe_apis = current_user.monitored_igxe_apis.replace(igxe_api,'')
+        current_user.save()
+    return JsonResponse({"remove":"ok"})
+def cancle_vip(request):
+    if request.GET.get("key") == "Wolverine":
+        username = request.GET.get("username")
+        user = User.objects.get(username=username)
+        user.is_vip = False
+        user.number_of_items = 0
+        user.time_span = 0
+        user.monitored_buff_apis = ''
+        user.monitored_igxe_apis = ''
+        user.price_restrictions = ''
+        user.wear_restrictions = ''
+        user.rare_restrictions = ''
+        user.save()
+    return JsonResponse({"cancle":"ok"})
 # def faq(request):
 #     return render(request,'faq.html')
 # def contact_us(request):
@@ -199,17 +319,16 @@ def buff_search(catagory,page="1"):
         print("page {} saved,of {} pages in {} catagory".format(page,total_page,catagory))
         return
 def shrinking_database(request):
-    catagory_list = ["knife","pistol","rifle","smg","shotgun","machinegun","hands"]
-    # f = open('missed.txt','w')
-    for i,cata in enumerate(catagory_list):
-        if i>5:
-            search_url = "https://buff.163.com/api/market/goods?game=csgo&page_num=1&category_group={}&page_size=50".format(cata)
-            r = requests.get(search_url)
-            data = r.json()
-            total_page = data["data"]["total_page"]
-            for page in range(total_page):
-                page_now = str(page + 1)
-                buff_search(cata,page_now)
-        print("{} checked".format(cata))
-    # f.close()
+    if request.GET.get("admin",None) == "ethan" and request.GET.get("pass",None) == "aires1121":
+        catagory_list = ["knife","pistol","rifle","smg","shotgun","machinegun","hands"]
+        for i,cata in enumerate(catagory_list):
+            if i>-1:
+                search_url = "https://buff.163.com/api/market/goods?game=csgo&page_num=1&category_group={}&page_size=50".format(cata)
+                r = requests.get(search_url)
+                data = r.json()
+                total_page = data["data"]["total_page"]
+                for page in range(total_page):
+                    page_now = str(page + 1)
+                    buff_search(cata,page_now)
+            print("{} checked".format(cata))
     return render(request,'sign_in.html')

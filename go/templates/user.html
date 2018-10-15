@@ -3,10 +3,14 @@
         <title>Golab|user</title>
         <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
         <script>
+            var monitor_space = {{monitor_space}}
             $(document).ready(function(){
                 $("#mainlink").click(function(){
                     window.location.href = "/"
                 })
+                if(monitor_space==0){
+                    alert("monitor space is full.delete some items first or upgrade")
+                }
             })
         </script>
     </head>
@@ -27,12 +31,13 @@
                     <td>玄学要求</td>
                 </tr>
                 {% if isvip is True %}
-                {% for i in len_item_list %}
+                {% for i in usr_info %}
                 <tr>
-                    <td>{{ monitored_items.i }}</td>
-                    <td>{{ price.i }}</td>
-                    <td>{{ wear.i }}</td>
-                    <td>{{ rare.i }}</td>
+                    <td>{{ i.item_name }}</td>
+                    <td>{{ i.price }}</td>
+                    <td>{{ i.wear }}</td>
+                    <td>{{ i.rare }}</td>
+                    <td><a href={{i.remove_href}}>remove</a></td>
                 </tr>
                 {% endfor %}
                 {% else %}
@@ -43,8 +48,8 @@
         <a href="/gogate/choose-level/">设置套餐</a>
         <br/>
         {% if isvip is True %}
-        <a href="/gogate/email/">change email</a>
-        <br/>
+        <!-- <a href="/gogate/email/">change email</a>
+        <br/> -->
         <p>change phone</p>
         {% endif %}
         <a href="/gogate/sign-out/">sign out</a>

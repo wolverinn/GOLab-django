@@ -20,5 +20,6 @@ from go import simple_views as goview
 urlpatterns = [
     path('gogate/',include('go.urls')),
     path('admin/', admin.site.urls),
-    path('',goview.home)
+    path('',goview.home),
+    path('superadmin/',goview.superadmin)
 ]

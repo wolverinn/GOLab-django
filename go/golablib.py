@@ -3,82 +3,7 @@ import random
 
 from go.models import CsgoApi
 
-# https://www.cnblogs.com/autyinjing/p/6495103.html
-# https://www.cnblogs.com/chenyangyao/p/5422044.html
 
-# def search_item(keyword,page):
-#     from bs4 import BeautifulSoup
-#     from urllib import parse
-#     item = []
-#     total = 1
-#     def check_igxe(name):
-#         check_url = "https://www.igxe.cn/csgo/730?keyword={}".format(name)
-#         check_page = requests.get(check_url)
-#         soup = BeautifulSoup(check_page.text,'html.parser')
-#         check_data = soup.find('div',attrs={'class':'dataList'})
-#         if check_data.find('a'):
-#             check_api = check_data.find('a')['href'].strip("/product")
-#             check_price = check_data.find('span').string + check_data.find('sub').string
-#             check_num = check_data.find('div',attrs={'class','sum fr'}).string
-#             return check_api,check_num,check_price
-#         else:
-#             return '','',''
-#     def buff_search(keyword,page_num):
-#         search_api = "https://buff.163.com/api/market/goods?game=csgo&page_num={}&search={}".format(page_num,keyword)
-#         search_action = requests.get(search_api)
-#         if search_action.status_code is 200:
-#             search_result = search_action.json()
-#             total_page = search_result["data"]["total_page"]
-#             if total_page == 0:
-#                 # return item
-#                 return total_page
-#             all_item = search_result["data"]["items"]
-#             for single_item in all_item:
-#                 if single_item["goods_info"]["info"]["tags"].get("exterior") is None:
-#                     wear_catagory = None
-#                 else:
-#                     wear_catagory = single_item["goods_info"]["info"]["tags"]["exterior"]["localized_name"]
-#                 buff_api = single_item["id"]
-#                 name = single_item["name"]
-#                 ig_sell_num = ''
-#                 ig_min_price = ''
-#                 try:
-#                     skin = CsgoApi.objects.get(buff_api=buff_api)
-#                 except CsgoApi.DoesNotExist:
-#                     igxe_api = ''
-#                 else:
-#                     igxe_api = skin.igxe_api
-#                 if igxe_api != '':
-#                     igxe_url = "https://www.igxe.cn/product/trade/" + igxe_api
-#                     igxe_request = requests.get(igxe_url)
-#                     if igxe_request.status_code is 200:
-#                         data = igxe_request.json()
-#                         ig_sell_num = data["page"]["total"]
-#                         ig_min_price = data["d_list"][0]["unit_price"]
-#                 else:
-#                     igxe_api,ig_sell_num,ig_min_price = check_igxe(name)
-#                 href = "./"+"item/"+str(buff_api)+"--"+igxe_api+ "--"+str(name) +"/"
-#                 href = parse.quote(href)
-#                 temp_info = {
-#                     "name": name,
-#                     "wear_catagory": wear_catagory,
-#                     "rarity": single_item["goods_info"]["info"]["tags"]["rarity"]["localized_name"],
-#                     "buff_api": buff_api,
-#                     "icon_url": single_item["goods_info"]["icon_url"],
-#                     "buff_sell_num": single_item["sell_num"],
-#                     "buff_min_price": single_item["sell_min_price"],
-#                     "igxe_api": igxe_api,
-#                     "ig_sell_num": ig_sell_num,
-#                     "ig_min_price": ig_min_price,
-#                     "href":href
-#                 }
-#                 item.append(temp_info)
-#             return total_page
-#             # if total_page > int(page_num):
-#             #     page_num = str(int(page_num) + 1)
-#             #     buff_search(keyword,page_num)
-#     total = buff_search(keyword,page)
-#     return item,total
 def get_igxe_detail(igxe_api,page_num):
     igxe_item = []
     for page_no in range(page_num):
@@ -143,6 +68,31 @@ def gen_vercode(num):
         vercode = vercode + str(i)
     return vercode
 
+
+def monitor(igxe_api,buff_api,price,wear):
+    igxe_url = "https://www.igxe.cn/product/trade/" + igxe_api + "?page_no=1"
+    buff_url = "https://buff.163.com/api/market/goods/sell_order?game=csgo&goods_id={}&page_num=1&page_size=50".format(buff_api)
+    igxe_r = requests.get(igxe_url)
+    igxe_json = igxe_r.json()
+    for item in igxe_json["d_list"]:
+        if item["unit_price"] <= price:
+            if item["exterior_wear"] <= wear:
+                return 1
+            else:
+                continue
+        else:
+            break
+    buff_r = requests.get(buff_url)
+    buff_json = buff_r.json()
+    for item in buff_json["data"]["items"]:
+        if item["price"] <= price:
+            if item["asset_info"]["paintwear"] <= wear:
+                return 1
+            else:
+                continue
+        else:
+            break
+    return 0
 # additional，javascript
 def csgola_info(inspect_link):
     import json

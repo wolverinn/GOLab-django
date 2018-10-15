@@ -17,7 +17,8 @@ class User(models.Model):
     start_day = models.DateField(null=True)
     time_span = models.IntegerField(null=True)
 # restrictions
-    monitored_items = models.CharField(max_length=200)
+    monitored_buff_apis = models.CharField(max_length=200,null=True,default='')
+    monitored_igxe_apis = models.CharField(max_length=200,null=True)
     price_restrictions = models.CharField(max_length=200)
     wear_restrictions = models.CharField(max_length=200)
     rare_restrictions = models.CharField(max_length=200)
@@ -30,3 +31,8 @@ class CsgoApi(models.Model):
     rarity = models.CharField(max_length=10)
     icon_url = models.URLField(null=True)
     catagory = models.CharField(max_length=30,null=True)
+
+class Declare(models.Model):
+    igxe_link = models.URLField(null=True)
+    buff_link = models.URLField(null=True)
+    checked = models.BooleanField(default=False)

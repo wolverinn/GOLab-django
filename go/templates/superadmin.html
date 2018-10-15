@@ -1,0 +1,26 @@
+<html>
+    <head>golab admin center</head>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <body>
+        <h1>golab admin center</h1>
+        {% if auth == True %}
+        <h3><a href="/gogate/database/?admin=ethan&pass=aires1121/">shrinking database</a></h3>
+        <h3>declared items:</h3>
+            {% for item in declare_list %}
+        <ul>
+            <li {{forloop.counter0}}>{{item.ig}}</li>
+            <li>{{item.buff}}</li>
+            <li><a href={{item.check_href}}>checked</a></li>
+            <li><a href={{item.check_href}}>remove</a></li>
+        </ul>
+            {% endfor %}
+        {% else %}
+        <form action="/superadmin/" method="POST">
+            {% csrf_token %}
+            <p>secret key</p>
+            <input type="password" name="secret_key">
+            <input type="submit" value="admin">
+        </form>
+        {% endif %}
+    </body>
+</html>

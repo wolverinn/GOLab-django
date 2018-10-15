@@ -1,61 +1,99 @@
 from django.shortcuts import render
 from django.http import HttpResponse,JsonResponse
 from django.http import HttpResponseRedirect
-from go.models import User
+from go.models import User,CsgoApi
 from django.core.mail import send_mail
 
 from golab import gen_vercode
 import os
 
 # Create your views here.
+# protection:user/payment/level/change-psss/
 
 
 def user(request):
     context = {}
+    vip_info = []
+    monitor_space = 2
+    isvip = False
     try:
         user = User.objects.get(username=request.session['username'])
     except:
         return HttpResponseRedirect('/gogate/sign-in/')
     if request.session.get('authenticated',False):
         if user.is_vip == True:
-            if request.GET.get('item_name',None) != None:
-                item_name = request.GET.get('item_name')
-                max_price = request.GET.get('max_price')
-                max_wear = request.GET.get('max_wear')
-                user.monitored_items = user.monitored_items + "**" + item_name
-                user.maximum_price = user.maximum_price + "**" + max_price
-                user.maximum_wear = user.maximum_wear + "**" + max_wear
-                user.save()
-        if user.monitored_items != '':
-            monitored_items = user.monitored_items
+            isvip = True
+            current_monitor_num = len(user.monitored_buff_apis.strip('*').split('**'))
+            if request.GET.get('buff_api','') != '':
+                if user.number_of_items>current_monitor_num:
+                    monitor_space = 1
+                    buff_api = request.GET.get('buff_api')
+                    ig_api = request.GET.get('ig_api')
+                    max_price = request.GET.get('max_price')
+                    max_wear = request.GET.get('max_wear')
+                    rare_info = request.GET.get('rare')
+                    user.monitored_buff_apis = user.monitored_buff_apis + "**" + buff_api
+                    user.monitored_igxe_apis = user.monitored_igxe_apis + "**" + ig_api
+                    user.price_restrictions = user.price_restrictions + "**" + max_price
+                    user.wear_restrictions = user.wear_restrictions + "**" + max_wear
+                    user.rare_restrictions = user.rare_restrictions + "**" + rare_info
+                    user.save()
+                else:
+                    monitor_space = 0
+        if user.monitored_buff_apis != '':
+            monitored_buff_apis = user.monitored_buff_apis
+            monitored_igxe_apis = user.monitored_igxe_apis
             price = user.price_restrictions
             wear = user.wear_restrictions
             rare = user.rare_restrictions
-            item_list = monitored_items.split('**')
-            price_list = price.split('**')
-            wear_list = wear.split('**')
-            rare_list = rare.split('**')
-            len_item_list = list(range(len(item_list)))
-            context = {
-                'monitored_items':item_list,
-                'price':price_list,
-                'wear':wear_list,
-                'rare':rare_list,
-                'isvip':True,
-                'len_list':len_item_list
-            }
-        else:
-            context = {
-                'monitored_items':'',
-                'price':'',
-                'wear':'',
-                'rare':'',
-                'isvip':False,
-                'len_list':[]
-            }
+            buff_api_list = monitored_buff_apis.strip('*').split('**')
+            if buff_api_list != ['']:
+                igxe_api_list = monitored_igxe_apis.strip('*').split('**')
+                price_list = price.strip('*').split('**')
+                wear_list = wear.strip('*').split('**')
+                rare_list = rare.strip('*').split('**')
+                for i,item_api in enumerate(buff_api_list):
+                    usr_item = CsgoApi.objects.get(buff_api=item_api)
+                    remove_href = "/gogate/remove_item?buff={}&igxe={}&price={}&wear={}&rare={}".format(item_api,igxe_api_list[i],price_list[i],wear_list[i],rare_list[i])
+                    temp_vip_info = {
+                        "item_name":usr_item.buff_name,
+                        "price":price_list[i],
+                        "wear":wear_list[i],
+                        "rare":rare_list[i],
+                        "remove_href":remove_href
+                    }
+                    vip_info.append(temp_vip_info)
+        context = {
+            'monitor_space':monitor_space,
+            'usr_info':vip_info,
+            'isvip':isvip,
+        }
         return render(request,'user.html',context)
     else:
         return HttpResponseRedirect('/gogate/sign-in/')
+def choose_level(request):
+    try:
+        user = User.objects.get(username=request.session['username'])
+    except:
+        return HttpResponseRedirect('/gogate/sign-in/')
+    if user.monitored_buff_apis == '':
+        context = {
+            # 'send_to_email':False,
+            'number_of_items':0,
+            'check_freq':0,
+            'start_day':0,
+            'time_span':0
+        }
+    else:
+        context = {
+            # 'send_to_email':user.send_to_mail,
+            'number_of_items':user.number_of_items,
+            'check_freq':user.check_frequency,
+            'start_day':user.start_day,
+            'time_span':user.time_span
+        }
+    return render(request,'choose_level.html',context)
+
 def sign_in(request):
     try:
         os.remove('./static/img/{}.png'.format(request.session['photo_vercode']))
@@ -138,25 +176,6 @@ def change_password(request):
     else:
         msg = "old password incorrect"
     return render(request,'change_pass.html',{'msg':msg})
-def choose_level(request):
-    user = User.objects.get(username=request.session['username'])
-    if user.monitored_items == '':
-        context = {
-            'send_to_email':False,
-            'number_of_items':0,
-            'check_freq':0,
-            'start_day':0,
-            'time_span':0
-        }
-    else:
-        context = {
-            'send_to_email':user.send_to_email,
-            'number_of_items':user.number_of_items,
-            'check_freq':user.check_frequency,
-            'start_day':user.start_day,
-            'time_span':user.time_span
-        }
-    return render(request,'choose_level.html',context)
 def change_email(request):
     if request.session.get('authenticated',False):
         msg = "mail"
@@ -187,6 +206,17 @@ def change_email(request):
         return HttpResponseRedirect('/gogate/sign-in/')
 
 def payment(request):
-    return render(request,'payment.html')
+    total_pay = 0
+    # if request.is_ajax():
+    #     if request.POST.get('paymsg') == 1:
+    if request.method == "POST":
+        num_index = ["1","3","5"]
+        freq_index = ["2","5","9"]
+        span_index = ["2","5","9"]
+        number_of_items = request.POST.get("number_of_items")
+        check_freq = request.POST.get("check_freq")
+        time_span = request.POST.get("time_span")
+        total_pay = 3 + num_index.index(number_of_items) + freq_index.index(check_freq) + span_index.index(time_span)
+    return render(request,'payment.html',{"payamount":total_pay,})
 def forget_pass(request):
     return render(request,'forget_pass.html')

@@ -19,5 +19,9 @@ urlpatterns = [
     path('user-state/',simple_views.user_state),
     path('forget-pass/',views.forget_pass),
     path('payment/',views.payment),
-    path('item/<path:api>/',simple_views.show_item)
+    path('item/<path:api>/',simple_views.show_item),
+    path('remove_item/',simple_views.remove_monitor_item),
+    path('api/v1/',simple_views.send_monitor_data),
+    path('api/v2/',simple_views.remove_user_item),
+    path('api/v3/',simple_views.cancle_vip),
 ]

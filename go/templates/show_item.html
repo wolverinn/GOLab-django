@@ -4,6 +4,7 @@
         <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
         <script>
             var ex_info={{ex_info}}
+            var if_ig={{if_ig}}
             $(document).ready(function(){
                 $("#head").load('/gogate/head/')
                 $("#foot").load('/gogate/foot/')
@@ -22,24 +23,36 @@
                 $("button#declare_confirm").click(function(){
                     igxe_declare_link = $("input#ig_declare_link").val()
                     buff_declare_link = $("input#buff_declare_link").val()
+                    $.ajax({
+                        url:"/gogate/item/declare/",
+                        type:"POST",
+                        data:{"ig":igxe_declare_link,"buff":buff_declare_link,'csrfmiddlewaretoken':$("[name='csrfmiddlewaretoken']").val()}
+                    }).done(function(data){
+                        alert("declared successfully")
+                    })
                 })
                 $("button#monitor").click(function(){
-                    name = $("span#item_name").text()
-                    $.ajax({
-                        url:"/gogate/user-state/",
-                        data:{'name':name},
-                        type:"GET",
-                    }).done(function(data){
-                        if(data['state'] == 0){
-                            alert("you need to log in first")
-                        }
-                        else if(data['state'] == 1){
-                            alert(" 你需要先设置套餐才能开启皮肤通知")
-                        }
-                        else{
-                            $('#show_rules').toggle()
-                        }
-                    })
+                    if(if_ig==0){
+                        alert("该皮肤无ig在售，无法实时通知")
+                    }
+                    else{
+                        name = $("span#item_name").text()
+                        $.ajax({
+                            url:"/gogate/user-state/",
+                            data:{'name':name},
+                            type:"GET",
+                        }).done(function(data){
+                            if(data['state'] == 0){
+                                alert("you need to log in first")
+                            }
+                            else if(data['state'] == 1){
+                                alert(" 你需要先设置套餐才能开启皮肤通知")
+                            }
+                            else{
+                                $('#show_rules').toggle()
+                            }
+                        })
+                    }
                 })
                 $("button#exinfo").click(function(){
                     inspecturl=$("a#steamlink1").attr("href")
@@ -76,10 +89,11 @@
             <button id="loadmore">加载更多</button>
         </p>
         <p>igxe最低价:￥{{sell_status.2}}|￥buff最低价:{{sell_status.3}}</p>
-        <p>得到了错误的搜索结果？<button id="declare">完善搜索结果</button></p>
+        <p>得到了错误或者不完全的搜索结果？<button id="declare">完善搜索结果</button></p>
         <div id="declarebox" hidden>
-            <p>输入皮肤的igxe链接：<input id="ig_declare_link"></p>
-            <p>输入皮肤的buff链接：<input id="buff_declare_link"></p>
+            {% csrf_token %}
+            <p>输入皮肤的igxe链接：<input type="url" id="ig_declare_link"></p>
+            <p>输入皮肤的buff链接：<input type="url" id="buff_declare_link"></p>
             <button id="declare_confirm"> 提交</button>
         </div>
         <!-- <input id="test"> -->
@@ -87,7 +101,16 @@
         <button id="monitor">monitor this item</button>
         <div id="show_rules" hidden>
             <form action="/gogate/user/" method="GET">
-                <input type="hidden" name="item_name" value={{item_name}}>
+                <input type="hidden" name="buff_api" value={{buff_api}}>
+                <input type="hidden" name="ig_api" value={{ig_api}}>
+                {% if ex_info == "0" %}
+                    <input type="hidden" name="rare" value="-1">
+                {% else %}
+                    <tr>
+                        <td>rare:</td>
+                        <td><input type="text" name="rare"></td>
+                    </tr>
+                {% endif %}
                 <tr>
                     <td>maximum price:</td>
                     <td><input type="text" name="max_price"></td>

@@ -1,6 +1,13 @@
 <html>
     <head>
         <title>golab|设置套餐</title>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $("#head").load('/gogate/head/')
+                $("#foot").load('/gogate/foot/')
+            })
+        </script>
     </head>
     <body>
         <h1>设置套餐</h1>
@@ -10,14 +17,14 @@
         {% else %}
         <table>
             <tr>
-                <td>notification method</td>
+                <!-- <td>notification method</td> -->
                 <td>maximum number of items</td>
                 <td>check frequency</td>
                 <td>start date</td>
                 <td>lasting for</td>
             </tr>
             <tr>
-                <td>{% if send_to_email is True %}email{% else %}text message{% endif %}</td>
+                <!-- <td>{% if send_to_email is True %}email{% else %}text message{% endif %}</td> -->
                 <td>{{ number_of_items }}</td>
                 <td>{{ check_freq }}</td>
                 <td>{{ start_day }}</td>
@@ -25,33 +32,29 @@
             </tr>
         </table>
         {% endif %}
+        <p>-------------------------New-------------------------</p>
         <form action="/gogate/payment/" method="POST">
             {% csrf_token %}
-            <input type="radio" name="send_to_email" value="email">
+            <!-- <input type="radio" name="send_to_email" value="email">
             <span>email</span>
             <br/>
             <input type="radio" name="send_to_email" value="phone">
             <span>phone</span>
-            <br/>
+            <br/> -->
             <span>number of items:</span>
-            <input type="number" name="number_of_items">
+            <label><input type="radio" name="number_of_items" value="1">1</label>
+            <label><input type="radio" name="number_of_items" value="3">3</label>
+            <label><input type="radio" name="number_of_items" value="5">5</label>
             <br/>
-            <span>check frequency: <br/>every</span>
+            <span>check frequency:</span>
+            <label><input type="radio" name="check_freq" value="2">2 min</label>
+            <label><input type="radio" name="check_freq" value="5">5 min</label>
+            <label><input type="radio" name="check_freq" value="9">9 min</label>
             <br/>
-            <input type="radio" name="freq" value="day">
-            <span>day</span>
-            <br/>
-            <input type="radio" name="freq" value="hours">
-            <span>hour</span>
-            <br/>
-            <input type="radio" name="freq" value="minutes">
-            <span>minute</span>
-            <br/>
-            <input type="radio" name="freq" value="seconds">
-            <span>20 seconds</span>
-            <br/>
-            <input type="number" name="time_span">
-            <span>lasting for(days):</span>
+            <span>lasting for:</span>
+            <label><input type="radio" name="time_span" value="2">2 days</label>
+            <label><input type="radio" name="time_span" value="5">5 days</label>
+            <label><input type="radio" name="time_span" value="9">9 days</label>
             <br/>
             <input type="submit" value="proceed to payment page">
         </form>
