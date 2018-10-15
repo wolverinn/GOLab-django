@@ -4,27 +4,11 @@ from django.http import HttpResponseRedirect
 from go.models import User
 from django.core.mail import send_mail
 
-from go import gen_vercode
+from golab import gen_vercode
 import os
-
-# after online:phone-verification-code/payment
-
-# html-base-head&foot(log-state)
-# js funcs:login-before-monitor
-# 玄学，Ajax加载搜索结果
-# https://www.cnblogs.com/seven-007/p/8034043.html
-# https://blog.csdn.net/tigaoban/article/details/78237244?foxhandler=RssReadRenderProcessHandler
-
 
 # Create your views here.
 
-
-def jsapi(request):
-    username = "default"
-    if request.is_ajax():
-        username = request.POST.get('username')
-    #     password = request.GET.get('password')
-    return JsonResponse({'res':username})
 
 def user(request):
     context = {}
@@ -91,7 +75,7 @@ def sign_in(request):
             if password == user.password and vercode == request.session['photo_vercode']:
                 request.session['authenticated'] = True
                 request.session['username'] = username
-                request.session['isvip'] = False
+                request.session['isvip'] = user.is_vip
             else:
                 correct_vercode = gen_vercode.gene_code(4)
                 request.session['photo_vercode'] = correct_vercode

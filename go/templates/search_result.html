@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>golab</title>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $("#head").load('/gogate/head/')
+                $("#foot").load('/gogate/foot/')
+                $("button#more").click(function(){
+                    // keyword = $("span#keyword").val()
+                    $.ajax({
+                        url:'/gogate/',
+                        type:"GET",
+                        data:{'keywords':keyword,'page_num':"2"}
+                    }).done(function(data){
+                        alert(keyword)
+                    })
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <div id="head"></div>
+        <h2>{{index}}:<span id="keyword">{{ search_item }}</span></h2>
+        {% if search_result != None %}
+            {% for item_catagory in search_result.items %}
+                <div>
+                    <span>{{ item_catagory.0 }}</span>
+                {% for item in item_catagory.1 %}
+                <ul>
+                    <li><a href={{item.href}}>{{item.name}}</a></li>
+                </ul>
+                {% endfor %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <h3>no search result</h3>
+        {% endif %}
+        <div id="foot"></div>
+    </body>
+</html>

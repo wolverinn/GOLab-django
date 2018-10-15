@@ -1,5 +1,6 @@
 <html>
     <head>
+        <title>GOLab</title>
         <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
         <script>
             $(document).ready(function(){
@@ -14,9 +15,6 @@
                         $("#in").show()
                     }
                 })
-                $("#mainlink").click(function(){
-                    window.location.href = "/"
-                })
                 $("#signout").click(function(){
                     $.ajax({
                         url:'/gogate/sign-out/',
@@ -26,15 +24,18 @@
                         // window.location.reload()
                     })
                 })
+                $("#faq").click(function(){
+                    alert("no faqs currently")
+                })
+                $("#contact").click(function(){
+                    alert("send email to: emzdn@163.com")
+                })
             })
         </script>
     </head>
     <body>
-        <div id="mainlink" style="cursor: hand;">
-            <h1>Golab</h1>
-            <h2>一键查询igxe/buff的csgo皮肤信息，获取玄学信息，以及获得最新提醒(目前只支持武器和手套)</h2>
-            <br/>
-        </div>
+        <h1>GOLab</h1>
+        <h2>一键查询igxe/buff的csgo皮肤信息，获取玄学信息，以及获得最新提醒(目前只支持武器和手套)</h2>
         <div id="out" hidden>
             <a href="/gogate/sign-in/">sign in</a>
             <br/>
@@ -51,5 +52,6 @@
             <input type = "text" name = "keywords">
             <input type="submit" value="GO">
         </form>
+        <a href="" id="faq">常见问题</a>|<a href="" id="contact">联系我们</a>
     </body>
 </html>

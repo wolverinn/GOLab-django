@@ -3,10 +3,26 @@
         <title>search results|golab</title>
         <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
         <script>
+            var ex_info={{ex_info}}
             $(document).ready(function(){
                 $("#head").load('/gogate/head/')
                 $("#foot").load('/gogate/foot/')
-                $("#show_rules").hide()
+                if(ex_info != "0"){
+                    $("button#exinfo").show()
+                }
+                $("button#loadmore").click(function(){
+                    page_num = $("input#pages").val()
+                    current_url = String(window.location.href)
+                    new_url = current_url.substring(0,current_url.lastIndexOf("--"))+"--"+String(page_num)+"/"
+                    window.location.href = new_url
+                })
+                $("button#declare").click(function(){
+                    $("div#declarebox").toggle()
+                })
+                $("button#declare_confirm").click(function(){
+                    igxe_declare_link = $("input#ig_declare_link").val()
+                    buff_declare_link = $("input#buff_declare_link").val()
+                })
                 $("button#monitor").click(function(){
                     name = $("span#item_name").text()
                     $.ajax({
@@ -21,8 +37,32 @@
                             alert(" 你需要先设置套餐才能开启皮肤通知")
                         }
                         else{
-                            $('#show_rules').show()
+                            $('#show_rules').toggle()
                         }
+                    })
+                })
+                $("button#exinfo").click(function(){
+                    inspecturl=$("a#steamlink1").attr("href")
+                    var needle = 'csgo_econ_action_preview%20'
+                    inspecturl = inspecturl.substring(inspecturl.indexOf(needle) + needle.length)
+                    // $("#test").val(inspecturl)
+                    $.ajax({
+                        url:"http://www.csgola.com/market_item_detail",
+                        type:"POST",
+                        data:{inspecturl: inspecturl},
+                        headers:{
+                            "Content-Length": "61",
+                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                            "Host": "www.csgola.com",
+                            "Origin": "http://www.csgola.com",
+                            "Referer": "http://www.csgola.com/float/",
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36",
+                            "X-Requested-With": "XMLHttpRequest"
+                        }
+                    }).done(function(data){
+                        alert("success")
+                    }).fail(function(){
+                        alert("该功能还在开发中")
                     })
                 })
             })
@@ -31,9 +71,21 @@
     <body>
         <div id="head"></div>
         <h3>showing items:<span id="item_name">{{ name }}</span></h3>
+        <p>igxe在售:{{sell_status.0}}|buff在售:{{sell_status.1}}，显示前
+            <input id="pages" type="text" value={{sell_status.4}}>页信息
+            <button id="loadmore">加载更多</button>
+        </p>
+        <p>igxe最低价:￥{{sell_status.2}}|￥buff最低价:{{sell_status.3}}</p>
+        <p>得到了错误的搜索结果？<button id="declare">完善搜索结果</button></p>
+        <div id="declarebox" hidden>
+            <p>输入皮肤的igxe链接：<input id="ig_declare_link"></p>
+            <p>输入皮肤的buff链接：<input id="buff_declare_link"></p>
+            <button id="declare_confirm"> 提交</button>
+        </div>
+        <!-- <input id="test"> -->
         <p>go to: <a href={{igxe_link}} target="_blank">igxe</a> | <a href={{buff_link}} target="_blank">buff</a></p>
         <button id="monitor">monitor this item</button>
-        <div id="show_rules">
+        <div id="show_rules" hidden>
             <form action="/gogate/user/" method="GET">
                 <input type="hidden" name="item_name" value={{item_name}}>
                 <tr>
@@ -49,11 +101,12 @@
                 </tr>
             </form>
         </div>
+        <button id="exinfo" hidden>加载玄学信息</button>
         {% for item in items %}
             <div>￥{{ item.price }} ({{ item.site }})</div>
             <ul>
                 <li>磨损：{{ item.wear }}</li>
-                <li><a href="{{ item.steam_link }}" target="_blank">检视链接</a></li>
+                <li><a href="{{ item.steam_link }}" target="_blank" id="steamlink{{ forloop.counter0 }}">检视链接</a></li>
             </ul>
         {% endfor %}
         <div id="foot"></div>

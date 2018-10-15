@@ -15,9 +15,9 @@ urlpatterns = [
     path('email/',views.change_email),
     # path('faq/',simple_views.faq),
     # path('contact-us/',simple_views.contact_us),
+    path('database/',simple_views.shrinking_database),
     path('user-state/',simple_views.user_state),
     path('forget-pass/',views.forget_pass),
     path('payment/',views.payment),
-    path('js_test/',views.jsapi),
     path('item/<path:api>/',simple_views.show_item)
 ]
