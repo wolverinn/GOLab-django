@@ -1,0 +1,130 @@
+<html>
+    <head>
+        <title>Golab|sign in</title>
+        <link rel="icon" href="home.ico" type="image/x-icon" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+        <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+        <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $("#home").click(function(){
+                    window.location.href="/"
+                })
+            })
+        </script>
+        <style>
+            body {background-color:#F0F8FF;text-align:center;}
+      
+        </style>
+    </head>
+    <body>
+        <br/><br/><br/><br/><br/>
+        <h1 class="font-weight-bold text-primary display-2" id="home" style="cursor: hand;">GOLab</h1>
+        <br/><br/><br/>
+      <ul class="nav nav-pills nav-justified" role="tablist" style="background:#C0C0C0;font-size:22px;">
+    {% if index == "in" %}
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="pill" href="#login">登录</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="pill" href="#register">注册</a>
+    </li>
+    {% else %}
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="pill" href="#login">登录</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" data-toggle="pill" href="#register">注册</a>
+      </li>
+    {% endif %}
+  </ul>
+
+  <div class="tab-content" style="font-size:22px;">
+    {% if index == "in" %}
+    <div id="login" class="container tab-pane active">
+            <br><br/>
+            <form action="/gogate/sign-in/" method="POST">
+            {% csrf_token %}
+            <p>用户名：
+            <input type="text" name = "username">
+            </p>
+            <p>密&nbsp;&nbsp;&nbsp;&nbsp;码：
+            <input type="password" name = "password">
+            </p>
+            <p>&nbsp;验证码：
+            <input type="text" name = "vercode">
+            {% load static %}
+            <br/>
+            <img src="{% static img %}" alt="verification" height=50 width=150 /> </p>
+            <br/>
+            <input type="submit" value="登录" class="btn btn-primary" style="font-size:22px;">
+            </form>
+            <br/><br/><br/>
+            <a href="/gogate/forget-pass/">&nbsp;&nbsp;忘记密码？</a>
+    </div>
+    <div id="register" class="container tab-pane fade">
+            <br><br/>
+        <form action="/gogate/sign-up/" method="POST">
+            {% csrf_token %}
+            <p>用户名：
+            <input type="text" name = "username"></p>
+            <p>密&nbsp;&nbsp;&nbsp;&nbsp;码：
+            <input type="password" name = "password"></p>
+            <p>&nbsp;验证码：
+            <input type="text" name = "vercode">
+            {% load static %}
+            <br/>
+            <img src="{% static img %}" alt="verification" height=50 width=150 /></p>
+            <br/>
+            <input type="submit" value="注册" class="btn btn-primary" style="font-size:22px;">
+        </form>
+    </div>
+  </div>  
+    {% else %}
+    <div id="login" class="container tab-pane fade">
+            <br><br/>
+            <form action="/gogate/sign-in/" method="POST">
+            {% csrf_token %}
+            <p>用户名：
+            <input type="text" name = "username">
+            </p>
+            <p>密&nbsp;&nbsp;&nbsp;&nbsp;码：
+            <input type="password" name = "password">
+            </p>
+            <p>&nbsp;验证码：
+            <input type="text" name = "vercode">
+            {% load static %}
+            <br/>
+            <img src="{% static img %}" alt="verification" height=50 width=150 /> </p>
+            <br/>
+            <input type="submit" value="登录" class="btn btn-primary" style="font-size:22px;">
+            </form>
+            <br/><br/><br/>
+            <a href="/gogate/forget-pass/">&nbsp;&nbsp;忘记密码？</a>
+    </div>
+    <div id="register" class="container tab-pane active">
+            <br><br/>
+        <form action="/gogate/sign-up/" method="POST">
+            {% csrf_token %}
+            <p>用户名：
+            <input type="text" name = "username"></p>
+            <p>密&nbsp;&nbsp;&nbsp;&nbsp;码：
+            <input type="password" name = "password"></p>
+            <p>&nbsp;验证码：
+            <input type="text" name = "vercode">
+            {% load static %}
+            <br/>
+            <img src="{% static img %}" alt="verification" height=50 width=150 /></p>
+            <br/>
+            <input type="submit" value="注册" class="btn btn-primary" style="font-size:22px;">
+        </form>
+    </div>
+  </div>
+  {% endif %}
+  
+    </body>
+</html>

@@ -10,13 +10,15 @@ from urllib import parse
 
 # Create your views here.
 
+# gather simple api
+# Nginx: https://www.zmrenwu.com/post/20/
 # ajax:load exinfo/js滑块验证
 # monitor using server/administration page:monitoring
 # phone-verification-code/payment
 
 
 def home(request):
-    return render(request,'home.html')
+    return render(request,'home.html',{"home_img":"./1.jpg"})
 def head(request):
     return render(request,'head.html')
 def foot(request):

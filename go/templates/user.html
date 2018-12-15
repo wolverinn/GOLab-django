@@ -1,6 +1,14 @@
 <html>
     <head>
         <title>Golab|user</title>
+        {% load static %}
+        <link rel="shortcut icon" href="{% static './home.ico' %}">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+        <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+        <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
         <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
         <script>
             var monitor_space = {{monitor_space}}
@@ -13,45 +21,65 @@
                 }
             })
         </script>
+        <style>
+            body {background-color:#F0F8FF;text-align:center;}
+            .right{
+                position:absolute;
+                right:3%;
+                top:15px;
+                  }   
+            .left{
+                position:absolute;
+                left:3%;
+                  }  
+        </style>
     </head>
     <body>
+        <h5 class="right">
+        <a href="/gogate/password/">修改密码</a>
+        |
+        <a href="/gogate/sign-out/">退出登录</a>
+        </h5>
+        <br/><br/><br/><br/><br/><br/>
         <div id="mainlink" style="cursor: hand;">
-            <h1>Golab|user</h1>
+            <h1 class="font-weight-bold text-primary display-2" style="font-size:80px;">Golab|user</h1>
             <br/>
         </div>
-        <a href="/gogate/password/">change password</a>
         <br/>
         <div>
-            <h3>monitering:</h3>
-            <table>
-                <tr>
-                    <td>item name</td>
-                    <td>maximum price</td>
-                    <td>maximum wear</td>
-                    <td>玄学要求</td>
-                </tr>
+            <h3 class="left">正在为您实时监测中：</h3>
+            <br/><br/>
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th>饰品名称</th>
+                        <th>价格上限</th>
+                        <th>磨损下限</th>
+                        <th>玄学要求</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
                 {% if isvip is True %}
                 {% for i in usr_info %}
-                <tr>
+                <tr class="text-center">
                     <td>{{ i.item_name }}</td>
                     <td>{{ i.price }}</td>
                     <td>{{ i.wear }}</td>
                     <td>{{ i.rare }}</td>
-                    <td><a href={{i.remove_href}}>remove</a></td>
-                </tr>
+                    <td><a href={{i.remove_href}}>删除</a></td>
+                </tr class="text-center">
                 {% endfor %}
                 {% else %}
                 <span>you are currently not a vip member,you need to become a vip to start monitoring items</span>
                 {% endif %}
             </table>
         </div>
-        <a href="/gogate/choose-level/">设置套餐</a>
+        <br/><br/><br/>
+        <a href="/gogate/choose-level/" class="btn btn-primary" style="font-size:25px;">设置套餐</a>
         <br/>
         {% if isvip is True %}
         <!-- <a href="/gogate/email/">change email</a>
         <br/> -->
-        <p>change phone</p>
         {% endif %}
-        <a href="/gogate/sign-out/">sign out</a>
     </body>
 </html>

@@ -8,7 +8,6 @@ In short, this simple website can:
 - check the skin pattern
 - monitor the specific skin and notify the users
 ## About the project
-I created this project to practice using django to construct the backend of a website,meanwhile I used some jquery too.But I didn't put css in the project.So the design doesn't look so pleasant.
+I created this project to practice using django to construct the backend of a website. Currently some functions need to be fixed and the design of the frontend need to be improved.
 ## Project details
-If you want to get this django project on a linux server and get it online,notice that some settings need to be done,and the file "gen_vercode.py" need to be modified.
-Also, I deleted the settins.py in golab for security reasons.
+If you want to get this django project on a linux server, use the "golab-linux" instead of "golab" folder.

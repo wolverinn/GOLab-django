@@ -126,7 +126,7 @@ def sign_in(request):
     authentication = request.session.get('authenticated',False)
     if authentication is True:
         return HttpResponseRedirect('/gogate/user/')
-    return render(request,'sign_in.html',{'auth':authentication,'img':img_src})
+    return render(request,'login_register.html',{'auth':authentication,'img':img_src,"index":"in"})
 def sign_up(request):
     try:
         os.remove('./static/img/{}.png'.format(request.session['photo_vercode']))
@@ -160,7 +160,7 @@ def sign_up(request):
     authentication = request.session.get('authenticated',False)
     if authentication is True:
         return HttpResponseRedirect('/gogate/user/')
-    return render(request,'sign_up.html',{'auth':authentication,'img':img_src})
+    return render(request,'login_register.html',{'img':img_src,"index":"up"})
 def sign_out(request):
     request.session['authenticated'] = False
     return HttpResponseRedirect('/gogate/')

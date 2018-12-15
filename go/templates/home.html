@@ -1,6 +1,14 @@
-<html>
+ <html>
     <head>
         <title>GOLab</title>
+        {% load static %}
+        <link rel="shortcut icon" href="{% static './home.ico' %}">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+        <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+        <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
         <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
         <script>
             $(document).ready(function(){
@@ -25,33 +33,67 @@
                     })
                 })
                 $("#faq").click(function(){
-                    alert("no faqs currently")
+                    alert("暂无")
                 })
                 $("#contact").click(function(){
-                    alert("send email to: emzdn@163.com")
+                    alert("如果您有任何疑问或建议，欢迎邮件至1207547992@qq.com，我们随时愿意倾听！")
                 })
             })
         </script>
+        <style>
+            body {text-align:center;
+                  {% load static %}
+                  background-image:url('{% static home_img %}');
+                  background-repeat:no-repeat;
+                  background-attachment:fixed;
+                  background-position:center top;
+                  background-size:cover;
+              }
+            .button{
+                     background-color: #4CAF50;
+                     border: none;
+                     color: white;
+                     padding: 6px 32px;
+                     text-align: center;
+                     text-decoration: none;
+                     display: inline-block;
+                     font-size: 20px;
+                     margin: 0px 6px;
+                     cursor: pointer;
+                     border-radius: 12px;
+                     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+                 }
+            .right{
+            	position:absolute;
+                right:3%;
+                top:15px;
+                  }   
+        </style>
     </head>
     <body>
-        <h1>GOLab</h1>
-        <h2>一键查询igxe/buff的csgo皮肤信息，获取玄学信息，以及获得最新提醒(目前只支持武器和手套)</h2>
-        <div id="out" hidden>
-            <a href="/gogate/sign-in/">sign in</a>
-            <br/>
-            <a href="/gogate/sign-up/">sign up</a>
-        </div>
-        <div id="in" hidden>
-            <a href="/gogate/user/">user center</a>
-            <br/>
-            <a href id="signout">sign out</a>
-        </div>
-        <br/>
-        <p>输入皮肤名称进行查询</p>
-        <form action = "/gogate/" method="get">
-            <input type = "text" name = "keywords">
-            <input type="submit" value="GO">
-        </form>
-        <a href="" id="faq">常见问题</a>|<a href="" id="contact">联系我们</a>
+        	<div class="right">
+        	 <h5><a href="/gogate/sign-in/" class="btn btn-primary">登录</a>   <a href="/gogate/sign-up/" class="btn btn-primary">注册</a></h5>
+        	</div>
+        	<br/><br/><br/><br/><br/><br/>
+            <h1 class="font-weight-bold text-primary display-2" style="font-size:120px;">GOLab</h1>
+            <br/><br/><br/>
+            <h4 class="bg-secondary text-white" style="font-size:26px;">一键查询igxe/buff的csgo皮肤信息，获取玄学信息，以及获得最新提醒(目前只支持武器和手套)</h4>
+            <div id="out" hidden>
+                <a href="/gogate/sign-in/">sign in</a>
+                <br/>
+                <a href="/gogate/sign-up/">sign up</a>
+            </div>
+            <div id="in" hidden>
+                <a href="/gogate/user/">user center</a>
+                <br/>
+                <a href id="signout">sign out</a>
+            </div>
+            <br/><br/><br/>
+            <form action = "/gogate/" method="get">
+                <input type = "text" name = "keywords" placeholder="输入皮肤名称进行查询" style="width:800px;font-size:30px;">
+                <input type="submit" value="GO" class="button font-weight-bold" style="font-size:30px;">
+            </form>
+            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+            <h5><a href="" id="faq" style="color:#B2FF99;font-size:23px;">常见问题</a>|<a href="" id="contact" style="color:#B2FF99;font-size:23px;">联系我们</a></h5>
     </body>
 </html>
